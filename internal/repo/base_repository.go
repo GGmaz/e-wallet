@@ -15,7 +15,7 @@ func (r Repo[T]) Create(db *gorm.DB, t *T) *gorm.DB {
 	return db.Create(&t)
 }
 
-func (r Repo[T]) GetById(db *gorm.DB, t *T, id string, preload ...string) *gorm.DB {
+func (r Repo[T]) GetById(db *gorm.DB, t *T, id int64, preload ...string) *gorm.DB {
 	for _, m := range preload {
 		db = db.Preload(m)
 	}

@@ -1,13 +1,10 @@
 package server
 
 import (
-	"fmt"
 	"github.com/GGmaz/wallet-arringo/config"
 	"github.com/GGmaz/wallet-arringo/internal/db"
-	"github.com/GGmaz/wallet-arringo/internal/repo"
 	v1 "github.com/GGmaz/wallet-arringo/internal/server/api"
 	"github.com/gin-gonic/gin"
-	"github.com/nats-io/nats.go"
 	"gorm.io/gorm"
 	"log"
 )
@@ -44,18 +41,6 @@ func (server *Server) Start() {
 	r.Use(dbMiddleware(gormDB))
 	r.Use(CORSMiddleware())
 
-	//// Create a NATS connection
-	////nc, err := nats.Connect(nats.DefaultURL)
-	//nc, err := nats.Connect(server.config.NatsUrl)
-	//if err != nil {
-	//	log.Fatal("Failed to connect to NATS" + err.Error())
-	//	return
-	//}
-	//startNats(nc, gormDB)
-	//defer nc.Close()
-	//
-	//go startKafkaConsumer(gormDB, server.config.KafkaUrl)
-
 	v1.RegisterVersion(r)
 
 	err = r.Run(":" + server.config.Port)
@@ -66,33 +51,6 @@ func (server *Server) Start() {
 	}
 
 	println("Starting server on port: " + server.config.Port)
-}
-
-func startNats(nc *nats.Conn, gormDB *gorm.DB) {
-	log.Println("Connected to " + nats.DefaultURL)
-
-	_, err := nc.Subscribe("balance-request", func(m *nats.Msg) {
-		// Parse the user email from the request parameters
-		userEmail := string(m.Data)
-		// Get users balance
-		balance, err := repo.GetBalanceForUserMail(gormDB, userEmail)
-		if err != nil {
-			println("Could not get balance")
-			return
-		}
-
-		balanceBytes := []byte(fmt.Sprintf("%.2f", balance))
-
-		err = nc.Publish(m.Reply, balanceBytes)
-		if err != nil {
-			println("Could not publish balance")
-			return
-		}
-	})
-	if err != nil {
-		println("Could not subscribe to balance-request")
-		return
-	}
 }
 
 func CORSMiddleware() gin.HandlerFunc {

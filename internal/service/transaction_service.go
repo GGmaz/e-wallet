@@ -8,16 +8,14 @@ import (
 	"github.com/GGmaz/wallet-arringo/pkg/enums"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"strconv"
 )
 
 type TransactionServiceImpl struct {
 	TransactionRepo repo.Repo[model.Transaction]
 	UserRepo        repo.Repo[model.User]
-	Conn            gorm.DB
 }
 
-func (s *TransactionServiceImpl) CreateTransaction(db *gorm.DB, userId int64, amount, balance float64, txType model.TxType) error {
+func (s *TransactionServiceImpl) CreateTransaction(db *gorm.DB, userId int64, amount, balance float64, txType enums.TxType) error {
 	tx := &model.Transaction{
 		UserID:          userId,
 		Amount:          amount,
@@ -40,7 +38,7 @@ func (s *TransactionServiceImpl) AddMoney(c *gin.Context, id int64, amount float
 
 	user := &model.User{}
 
-	res := s.UserRepo.GetById(tx, user, strconv.FormatInt(id, 10))
+	res := s.UserRepo.GetById(tx, user, id)
 	if res.Error != nil {
 		tx.Rollback()
 		return 0, res.Error
@@ -73,13 +71,13 @@ func (s *TransactionServiceImpl) TransferMoney(c *gin.Context, from int64, to in
 	fromUser := &model.User{}
 	toUser := &model.User{}
 
-	res := s.UserRepo.GetById(tx, fromUser, strconv.FormatInt(from, 10))
+	res := s.UserRepo.GetById(tx, fromUser, from)
 	if res.Error != nil {
 		tx.Rollback()
 		return res.Error
 	}
 
-	res = s.UserRepo.GetById(tx, toUser, strconv.FormatInt(to, 10))
+	res = s.UserRepo.GetById(tx, toUser, to)
 	if res.Error != nil {
 		tx.Rollback()
 		return res.Error

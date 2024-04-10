@@ -8,6 +8,8 @@ import (
 
 type Wires struct {
 	TransactionService service.TransactionServiceImpl
+	UserService        service.UserServiceImpl
+	AccountService     service.AccountServiceImpl
 }
 
 func Init() *Wires {
@@ -15,6 +17,13 @@ func Init() *Wires {
 		TransactionService: service.TransactionServiceImpl{
 			TransactionRepo: repo.Repo[model.Transaction]{},
 			UserRepo:        repo.Repo[model.User]{},
+		},
+		UserService: service.UserServiceImpl{
+			UserRepo: repo.Repo[model.User]{},
+		},
+		AccountService: service.AccountServiceImpl{
+			AccountRepo: repo.Repo[model.Account]{},
+			UserRepo:    repo.Repo[model.User]{},
 		},
 	}
 	return &w
