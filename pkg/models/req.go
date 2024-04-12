@@ -1,12 +1,13 @@
 package models
 
 type AddMoneyReq struct {
-	UserID int64   `json:"user_id"`
-	Amount float64 `json:"amount"`
+	UserID    int64   `json:"user_id"`
+	AccNumber string  `json:"acc_number"`
+	Amount    float64 `json:"amount"`
 }
 
 type TransferMoneyReq struct {
-	From   int64   `json:"from_user_id"`
-	To     int64   `json:"to_user_id"`
-	Amount float64 `json:"amount_to_transfer"`
+	From   string  `json:"from_acc_id"`
+	To     string  `json:"to_acc_id"`
+	Amount float64 `json:"amount"`
 }

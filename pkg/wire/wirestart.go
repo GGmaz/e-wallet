@@ -17,6 +17,7 @@ func Init() *Wires {
 		TransactionService: service.TransactionServiceImpl{
 			TransactionRepo: repo.Repo[model.Transaction]{},
 			UserRepo:        repo.Repo[model.User]{},
+			AccountRepo:     repo.Repo[model.Account]{},
 		},
 		UserService: service.UserServiceImpl{
 			UserRepo: repo.Repo[model.User]{},

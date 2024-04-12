@@ -6,8 +6,8 @@ import (
 )
 
 func RegisterVersion(router *gin.Engine) {
-	router.Group("/api/v1")
-	v1.RegisterUser(router)
-	v1.RegisterTransaction(router)
-	v1.RegisterAccount(router)
+	r := router.Group("/api/v1")
+	v1.RegisterUser(r)
+	v1.RegisterTransaction(r)
+	v1.RegisterAccount(r)
 }

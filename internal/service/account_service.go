@@ -25,6 +25,7 @@ func (s *AccountServiceImpl) CreateAccount(db *gorm.DB, accNum string, userId in
 		AccNumber: accNum,
 		Balance:   0,
 		Status:    enums.AccountStatus(enums.UNVERIFIED),
+		UserId:    userId,
 	}
 
 	dbRes = s.AccountRepo.Create(db, acc)
@@ -32,11 +33,7 @@ func (s *AccountServiceImpl) CreateAccount(db *gorm.DB, accNum string, userId in
 		return nil, dbRes.Error
 	}
 
-	user.Accounts = append(user.Accounts, *acc)
-	dbRes = s.UserRepo.Save(db, user)
-	if dbRes.Error != nil {
-		return nil, dbRes.Error
-	}
+	//TODO: insert in redis for KYC
 
 	return acc, nil
 }

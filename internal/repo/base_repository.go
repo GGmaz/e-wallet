@@ -19,7 +19,7 @@ func (r Repo[T]) GetById(db *gorm.DB, t *T, id int64, preload ...string) *gorm.D
 	for _, m := range preload {
 		db = db.Preload(m)
 	}
-	return db.Clauses(clause.Locking{Strength: "UPDATE"}).First(&t, "id = ?", id)
+	return db.First(&t, "id = ?", id)
 }
 
 func (r Repo[T]) Save(db *gorm.DB, t *T) *gorm.DB {

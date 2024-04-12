@@ -44,9 +44,9 @@ func Init(cfg config.DBConfig) (*gorm.DB, error) {
 	fmt.Println("Created ", gormDB)
 
 	tables := []interface{}{
-		//TODO: Add all tables here
 		&model.Transaction{},
 		&model.User{},
+		&model.Account{},
 	} // Add all tables here
 	gormDB.AutoMigrate(tables...)
 	return gormDB, err

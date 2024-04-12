@@ -5,15 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetBalanceForUserMail(db *gorm.DB, mail string) (float64, error) {
+func GetUserByMail(db *gorm.DB, mail string) (*model.User, error) {
 	user := &model.User{Email: mail}
-	res := db.First(&user, "email = ?", mail)
+	res := db.Preload("Accounts").First(&user, "email = ?", mail)
 	if res.Error != nil {
-		return 0, res.Error
+		return nil, res.Error
 	}
-	return user.Balance, nil
+	return user, nil
 }
 
-func Create(gormDB *gorm.DB, t *model.User) *gorm.DB {
-	return gormDB.Create(&t)
+func HasUserAccount(db *gorm.DB, userId int64, accNum string) bool {
+	user := &model.User{}
+	acc := &model.Account{}
+	db.First(&user, userId)
+	db.First(&acc, "acc_number = ?", accNum)
+	return acc.UserId == user.ID
 }
