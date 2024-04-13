@@ -19,7 +19,7 @@ type TransactionServiceImpl struct {
 	AccountRepo     repo.Repo[model.Account]
 }
 
-func (s *TransactionServiceImpl) CreateTransaction(db *gorm.DB, userId int64, amount, balance float64, txType enums.TxType, accNum string, txStatus enums.TxStatus) (*model.Transaction, error) {
+func (s *TransactionServiceImpl) CreateTransaction(db *gorm.DB, userId int64, amount, balance float64, txType enums.TxType, accNum string, txStatus enums.TxStatus, pair string) (*model.Transaction, error) {
 	tx := &model.Transaction{
 		UserID:          userId,
 		Amount:          amount,
@@ -27,6 +27,7 @@ func (s *TransactionServiceImpl) CreateTransaction(db *gorm.DB, userId int64, am
 		TransactionType: txType,
 		AccountNumber:   accNum,
 		Status:          txStatus,
+		PairedAccNum:    pair,
 	}
 
 	dbRes := s.TransactionRepo.Create(db, tx)
@@ -62,7 +63,7 @@ func (s *TransactionServiceImpl) AddMoney(c *gin.Context, userId int64, amount f
 		return 0, res.Error
 	}
 
-	_, err := s.CreateTransaction(tx, userId, amount, acc.Balance, enums.CREDIT, accNum, enums.SUCCESS)
+	_, err := s.CreateTransaction(tx, userId, amount, acc.Balance, enums.CREDIT, accNum, enums.SUCCESS, "")
 	if err != nil {
 		tx.Rollback()
 		return 0, err
@@ -103,7 +104,7 @@ func (s *TransactionServiceImpl) Withdraw(c *gin.Context, userId int64, amount f
 		return 0, res.Error
 	}
 
-	_, err := s.CreateTransaction(tx, userId, amount, acc.Balance, enums.DEBIT, accNum, enums.SUCCESS)
+	_, err := s.CreateTransaction(tx, userId, amount, acc.Balance, enums.DEBIT, accNum, enums.SUCCESS, "")
 	if err != nil {
 		tx.Rollback()
 		return 0, err
@@ -147,7 +148,7 @@ func (s *TransactionServiceImpl) TransferMoney(c *gin.Context, from, to string, 
 	}
 
 	if fromAcc.UserId != toAcc.UserId {
-		transaction, err := s.CreateTransaction(tx, fromAcc.UserId, amount, fromAcc.Balance, enums.DEBIT, fromAcc.AccNumber, enums.RESERVED)
+		transaction, err := s.CreateTransaction(tx, fromAcc.UserId, amount, fromAcc.Balance, enums.DEBIT, fromAcc.AccNumber, enums.RESERVED, toAcc.AccNumber)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -165,17 +166,26 @@ func (s *TransactionServiceImpl) TransferMoney(c *gin.Context, from, to string, 
 		return nil
 	}
 
-	_, err := s.CreateTransaction(tx, fromAcc.UserId, amount, fromAcc.Balance, enums.DEBIT, fromAcc.AccNumber, enums.SUCCESS)
+	_, err := s.CreateTransaction(tx, fromAcc.UserId, amount, fromAcc.Balance, enums.DEBIT, fromAcc.AccNumber, enums.SUCCESS, toAcc.AccNumber)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	//TODO: to posle iz redisa sve ide (MOZE SE IZVUCI U POSEBNU FUNKCIJU)
+	err = s.DoTransfer(tx, fromAcc, amount, toAcc)
+	if err != nil {
+		return err
+	}
+
+	tx.Commit()
+	return nil
+}
+
+func (s *TransactionServiceImpl) DoTransfer(tx *gorm.DB, fromAcc *model.Account, amount float64, toAcc *model.Account) error {
 	fromAcc.Balance -= amount
 	toAcc.Balance += amount
 
-	res = s.AccountRepo.Update(tx, fromAcc, fromAcc.ID)
+	res := s.AccountRepo.Update(tx, fromAcc, fromAcc.ID)
 	if res.Error != nil {
 		tx.Rollback()
 		return res.Error
@@ -187,13 +197,11 @@ func (s *TransactionServiceImpl) TransferMoney(c *gin.Context, from, to string, 
 		return res.Error
 	}
 
-	_, err = s.CreateTransaction(tx, toAcc.UserId, amount, toAcc.Balance, enums.CREDIT, toAcc.AccNumber, enums.SUCCESS)
+	_, err := s.CreateTransaction(tx, toAcc.UserId, amount, toAcc.Balance, enums.CREDIT, toAcc.AccNumber, enums.SUCCESS, fromAcc.AccNumber)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-
-	tx.Commit()
 	return nil
 }
 

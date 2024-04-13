@@ -14,6 +14,7 @@ type Transaction struct {
 	TransactionType enums.TxType   `gorm:"not null" json:"transaction_type"`
 	Status          enums.TxStatus `gorm:"not null" json:"status"`
 	CreatedAt       time.Time      `json:"created_at" gorm:"default:now()"`
+	PairedAccNum    string         `json:"paired_tx_num"`
 }
 
 func (tx Transaction) GetName() string {

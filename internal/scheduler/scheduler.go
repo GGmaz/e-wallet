@@ -4,6 +4,7 @@ import (
 	"github.com/GGmaz/wallet-arringo/pkg/wire"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
+	"gorm.io/gorm"
 	"log"
 	"strings"
 	"time"
@@ -63,11 +64,19 @@ func processOldData(ctx *gin.Context, keyPattern string, redisClient *redis.Clie
 					continue
 				}
 			} else if keyPattern == "transactionId:" {
-				tx, err := wire.Svc.TransactionService.GetTransactionById(ctx, restOfString)
+				txFrom, err := wire.Svc.TransactionService.GetTransactionById(ctx, restOfString)
 				if err != nil {
 					continue
 				}
-				
+
+				//TODO: dalje
+				accFrom, err := wire.Svc.AccountService.
+				accTo
+
+				db := ctx.MustGet("transaction").(*gorm.DB)
+				t := db.Begin()
+				err = wire.Svc.TransactionService.DoTransfer(t, txFrom.)
+
 			}
 
 			// Perform action on the data (e.g., delete the key)
