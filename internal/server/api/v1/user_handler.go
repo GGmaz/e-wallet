@@ -4,7 +4,6 @@ import (
 	"github.com/GGmaz/wallet-arringo/internal/db/model"
 	"github.com/GGmaz/wallet-arringo/pkg/wire"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func RegisterUser(v1 *gin.RouterGroup) {
@@ -28,8 +27,7 @@ func createUser(c *gin.Context) {
 		return
 	}
 
-	db := c.MustGet("transaction").(*gorm.DB)
-	user, err := wire.Svc.UserService.CreateUser(db, createUser.Email, createUser.FirstName, createUser.LastName, createUser.Address)
+	user, err := wire.Svc.UserService.CreateUser(c, createUser.Email, createUser.FirstName, createUser.LastName, createUser.Address)
 	if err != nil {
 		c.PureJSON(500, gin.H{"error": err.Error()})
 		return
@@ -46,8 +44,7 @@ func getAccounts(c *gin.Context) {
 		return
 	}
 
-	db := c.MustGet("transaction").(*gorm.DB)
-	res, err := wire.Svc.UserService.GetAccounts(db, userEmail)
+	res, err := wire.Svc.UserService.GetAccounts(c, userEmail)
 	if err != nil {
 		c.PureJSON(500, gin.H{"error": err.Error()})
 		return

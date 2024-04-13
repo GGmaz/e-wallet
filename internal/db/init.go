@@ -7,14 +7,16 @@ import (
 	"github.com/GGmaz/wallet-arringo/internal/db/model"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-func Init(cfg config.DBConfig) (*gorm.DB, error) {
+func InitPg(cfg config.DBConfigPg) (*gorm.DB, error) {
 	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Dbname)
 	sqlDB, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
@@ -50,4 +52,19 @@ func Init(cfg config.DBConfig) (*gorm.DB, error) {
 	} // Add all tables here
 	gormDB.AutoMigrate(tables...)
 	return gormDB, err
+}
+
+func InitRedis(cfg config.DBConfigRedis) (*redis.Client, error) {
+	client := redis.NewClient(&redis.Options{
+		Addr: cfg.Host + ":" + strconv.Itoa(cfg.Port),
+		DB:   0, // use default DB
+	})
+
+	// Test connection
+	_, err := client.Ping(context.Background()).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }

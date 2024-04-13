@@ -3,8 +3,10 @@ package server
 import (
 	"github.com/GGmaz/wallet-arringo/config"
 	"github.com/GGmaz/wallet-arringo/internal/db"
+	"github.com/GGmaz/wallet-arringo/internal/scheduler"
 	v1 "github.com/GGmaz/wallet-arringo/internal/server/api"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 	"log"
 )
@@ -13,9 +15,17 @@ type Server struct {
 	config *config.Config
 }
 
-func dbMiddleware(gormDB *gorm.DB) gin.HandlerFunc {
+func pgMiddleware(gormDB *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("transaction", gormDB)
+		c.Next()
+	}
+}
+
+func redisMiddleware(redisClient *redis.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("redis", redisClient)
+		scheduler.StartDataCollector(c, redisClient)
 		c.Next()
 	}
 }
@@ -30,15 +40,21 @@ func (server *Server) Start() {
 	r := gin.Default()
 	r.Use(gin.Logger())
 
-	gormDB, err := db.Init(server.config.Db)
+	gormDB, err := db.InitPg(server.config.DbPg)
 	if err != nil {
-		log.Fatal("Could not connect to the database" + err.Error())
+		log.Fatal("Could not connect to Postgres" + err.Error())
+		return
+	}
+
+	redisClient, err := db.InitRedis(server.config.DbRedis)
+	if err != nil {
+		log.Fatal("Could not connect to Redis" + err.Error())
 		return
 	}
 
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
 	r.Use(gin.Recovery())
-	r.Use(dbMiddleware(gormDB))
+	r.Use(pgMiddleware(gormDB), redisMiddleware(redisClient))
 	r.Use(CORSMiddleware())
 
 	v1.RegisterVersion(r)

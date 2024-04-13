@@ -7,14 +7,13 @@ import (
 )
 
 type Config struct {
-	Port     string
-	Host     string
-	Db       DBConfig
-	NatsUrl  string
-	KafkaUrl string
+	Port    string
+	Host    string
+	DbPg    DBConfigPg
+	DbRedis DBConfigRedis
 }
 
-type DBConfig struct {
+type DBConfigPg struct {
 	Host     string
 	Port     int
 	User     string
@@ -23,9 +22,18 @@ type DBConfig struct {
 	SslMode  string
 }
 
-func NewConfig() *Config {
-	port, err := strconv.Atoi(goDotEnvVariable("DB_PORT"))
+type DBConfigRedis struct {
+	Host string
+	Port int
+}
 
+func NewConfig() *Config {
+	portPg, err := strconv.Atoi(goDotEnvVariable("DB_PG_PORT"))
+	if err != nil {
+		return nil
+	}
+
+	portRedis, err := strconv.Atoi(goDotEnvVariable("DB_REDIS_PORT"))
 	if err != nil {
 		return nil
 	}
@@ -33,16 +41,18 @@ func NewConfig() *Config {
 	return &Config{
 		Port: goDotEnvVariable("PORT"),
 		Host: goDotEnvVariable("HOST"),
-		Db: DBConfig{
-			User:     goDotEnvVariable("DB_USER"),
-			Dbname:   goDotEnvVariable("DB_NAME"),
-			Host:     goDotEnvVariable("DB_HOST"),
+		DbPg: DBConfigPg{
+			User:     goDotEnvVariable("DB_PG_USER"),
+			Dbname:   goDotEnvVariable("DB_PG_NAME"),
+			Host:     goDotEnvVariable("DB_PG_HOST"),
 			SslMode:  "false",
-			Password: goDotEnvVariable("DB_PASSWORD"),
-			Port:     port,
+			Password: goDotEnvVariable("DB_PG_PASSWORD"),
+			Port:     portPg,
 		},
-		//NatsUrl:  goDotEnvVariable("NATS_URL"),
-		//KafkaUrl: goDotEnvVariable("KAFKA_URL"),
+		DbRedis: DBConfigRedis{
+			Host: goDotEnvVariable("DB_REDIS_HOST"),
+			Port: portRedis,
+		},
 	}
 }
 
