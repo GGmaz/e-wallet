@@ -16,7 +16,6 @@ func RegisterTransaction(v1 *gin.RouterGroup) {
 }
 
 func transferMoney(c *gin.Context) {
-	//TODO: check if account are verified
 	var req models.TransferMoneyReq
 	err := c.BindJSON(&req)
 	if err != nil {
@@ -39,7 +38,6 @@ func transferMoney(c *gin.Context) {
 }
 
 func deposit(c *gin.Context) {
-	//TODO: check if account are verified
 	var req models.AddMoneyReq
 	err := c.BindJSON(&req)
 	if err != nil {
@@ -62,7 +60,6 @@ func deposit(c *gin.Context) {
 }
 
 func withdraw(c *gin.Context) {
-	//TODO: check if account are verified
 	var req models.AddMoneyReq
 	err := c.BindJSON(&req)
 	if err != nil {

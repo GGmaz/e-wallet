@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
+	"log"
 	"strconv"
 	"time"
 )
@@ -39,6 +40,16 @@ func (s *TransactionServiceImpl) CreateTransaction(db *gorm.DB, userId int64, am
 }
 
 func (s *TransactionServiceImpl) AddMoney(c *gin.Context, userId int64, amount float64, accNum string) (float64, error) {
+	balance, err := s.myTransfer(c, userId, amount, accNum, enums.CREDIT)
+	if err != nil {
+		return balance, err
+	}
+
+	log.Println("Money has been successfully deposited to the account: ", accNum)
+	return balance, nil
+}
+
+func (s *TransactionServiceImpl) myTransfer(c *gin.Context, userId int64, amount float64, accNum string, transferType enums.TxType) (float64, error) {
 	db := c.MustGet("transaction").(*gorm.DB)
 
 	if !repo.HasUserAccount(db, userId, accNum) || !repo.IsAccountVerified(db, accNum) {
@@ -55,7 +66,16 @@ func (s *TransactionServiceImpl) AddMoney(c *gin.Context, userId int64, amount f
 		return 0, res.Error
 	}
 
-	acc.Balance += amount
+	if transferType == enums.CREDIT {
+		acc.Balance += amount
+	} else if transferType == enums.DEBIT {
+		if acc.Balance < amount {
+			tx.Rollback()
+			return 0, errors.New("insufficient balance on account")
+		}
+
+		acc.Balance -= amount
+	}
 
 	res = s.AccountRepo.Update(tx, acc, acc.ID)
 	if res.Error != nil {
@@ -63,14 +83,13 @@ func (s *TransactionServiceImpl) AddMoney(c *gin.Context, userId int64, amount f
 		return 0, res.Error
 	}
 
-	_, err := s.CreateTransaction(tx, userId, amount, acc.Balance, enums.CREDIT, accNum, enums.SUCCESS, "")
+	_, err := s.CreateTransaction(tx, userId, amount, acc.Balance, transferType, accNum, enums.SUCCESS, "")
 	if err != nil {
 		tx.Rollback()
 		return 0, err
 	}
 
 	tx.Commit()
-
 	return acc.Balance, nil
 }
 
@@ -112,6 +131,7 @@ func (s *TransactionServiceImpl) Withdraw(c *gin.Context, userId int64, amount f
 
 	tx.Commit()
 
+	log.Println("Money has been successfully withdrawn from the account: ", accNum)
 	return acc.Balance, nil
 }
 
@@ -163,25 +183,35 @@ func (s *TransactionServiceImpl) TransferMoney(c *gin.Context, from, to string, 
 		}
 
 		tx.Commit()
+		log.Println("Transaction has been successfully reserved")
 		return nil
 	}
 
-	_, err := s.CreateTransaction(tx, fromAcc.UserId, amount, fromAcc.Balance, enums.DEBIT, fromAcc.AccNumber, enums.SUCCESS, toAcc.AccNumber)
+	err := s.DoTransfer(tx, fromAcc, amount, toAcc, "")
+	if err != nil {
+		return err
+	}
+
+	_, err = s.CreateTransaction(tx, fromAcc.UserId, amount, fromAcc.Balance, enums.DEBIT, fromAcc.AccNumber, enums.SUCCESS, toAcc.AccNumber)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	err = s.DoTransfer(tx, fromAcc, amount, toAcc)
-	if err != nil {
-		return err
-	}
-
 	tx.Commit()
+	log.Println("Money has been successfully transferred from account: ", fromAcc.AccNumber, " to account: ", toAcc.AccNumber)
 	return nil
 }
 
-func (s *TransactionServiceImpl) DoTransfer(tx *gorm.DB, fromAcc *model.Account, amount float64, toAcc *model.Account) error {
+func (s *TransactionServiceImpl) DoTransfer(tx *gorm.DB, fromAcc *model.Account, amount float64, toAcc *model.Account, transactionId string) error {
+	if transactionId != "" {
+		err := s.updateReservedTx(tx, transactionId, amount)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
 	fromAcc.Balance -= amount
 	toAcc.Balance += amount
 
@@ -202,6 +232,30 @@ func (s *TransactionServiceImpl) DoTransfer(tx *gorm.DB, fromAcc *model.Account,
 		tx.Rollback()
 		return err
 	}
+
+	return nil
+}
+
+func (s *TransactionServiceImpl) updateReservedTx(tx *gorm.DB, transactionId string, amount float64) error {
+	// Convert transactionId to int64
+	txIdInt, err := strconv.ParseInt(transactionId, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	transaction := &model.Transaction{}
+	res := s.TransactionRepo.GetById(tx, transaction, txIdInt)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	transaction.Status = enums.SUCCESS
+	transaction.Balance -= amount
+	res = s.TransactionRepo.Update(tx, transaction, transaction.ID)
+	if res.Error != nil {
+		return res.Error
+	}
+
 	return nil
 }
 

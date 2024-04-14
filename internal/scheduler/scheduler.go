@@ -1,6 +1,8 @@
 package scheduler
 
 import (
+	"github.com/GGmaz/wallet-arringo/internal/db/model"
+	"github.com/GGmaz/wallet-arringo/internal/repo"
 	"github.com/GGmaz/wallet-arringo/pkg/wire"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -63,20 +65,40 @@ func processOldData(ctx *gin.Context, keyPattern string, redisClient *redis.Clie
 				if err != nil {
 					continue
 				}
+				log.Println("Account ", restOfString, " has been successfully verified.")
 			} else if keyPattern == "transactionId:" {
 				txFrom, err := wire.Svc.TransactionService.GetTransactionById(ctx, restOfString)
 				if err != nil {
 					continue
 				}
 
-				//TODO: dalje
-				accFrom, err := wire.Svc.AccountService.
-				accTo
-
 				db := ctx.MustGet("transaction").(*gorm.DB)
-				t := db.Begin()
-				err = wire.Svc.TransactionService.DoTransfer(t, txFrom.)
+				tx := db.Begin()
+				defer tx.Rollback()
 
+				fromAcc := &model.Account{}
+				toAcc := &model.Account{}
+
+				res := repo.GetAccountByNum(tx, fromAcc, txFrom.AccountNumber)
+				if res.Error != nil {
+					tx.Rollback()
+					continue
+				}
+
+				res = repo.GetAccountByNum(tx, toAcc, txFrom.PairedAccNum)
+				if res.Error != nil {
+					tx.Rollback()
+					continue
+				}
+
+				err = wire.Svc.TransactionService.DoTransfer(tx, fromAcc, txFrom.Amount, toAcc, restOfString)
+				if err != nil {
+					tx.Rollback()
+					continue
+				}
+
+				tx.Commit()
+				log.Println("Transaction ", restOfString, " has been successfully processed.")
 			}
 
 			// Perform action on the data (e.g., delete the key)

@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
+	"log"
 	"time"
 )
 
@@ -20,9 +21,7 @@ func (s *AccountServiceImpl) CreateAccount(c *gin.Context, accNum string, userId
 	db := c.MustGet("transaction").(*gorm.DB)
 	r := c.MustGet("redis").(*redis.Client)
 
-	//TODO: mozda ubaciti sve u sklopu jedne transakcije
 	user := &model.User{}
-
 	dbRes := s.UserRepo.GetById(db, user, userId)
 	if dbRes.Error != nil {
 		return nil, dbRes.Error
@@ -47,6 +46,7 @@ func (s *AccountServiceImpl) CreateAccount(c *gin.Context, accNum string, userId
 		return nil, err
 	}
 
+	log.Println("Account was sent for verification")
 	return acc, nil
 }
 

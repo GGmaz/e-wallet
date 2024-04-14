@@ -6,6 +6,7 @@ import (
 	"github.com/GGmaz/wallet-arringo/pkg/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"log"
 )
 
 type UserServiceImpl struct {
@@ -26,6 +27,7 @@ func (s *UserServiceImpl) CreateUser(c *gin.Context, email, firstName, lastName,
 		return nil, dbRes.Error
 	}
 
+	log.Println("User created")
 	return user, nil
 }
 
@@ -46,5 +48,6 @@ func (s *UserServiceImpl) GetAccounts(c *gin.Context, email string) (*models.Acc
 		accData.Accounts = user.Accounts
 	}
 
+	log.Println("User accounts retrieved successfully")
 	return accData, nil
 }
