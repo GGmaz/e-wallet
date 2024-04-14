@@ -4,7 +4,6 @@ import (
 	"github.com/GGmaz/wallet-arringo/pkg/models"
 	"github.com/GGmaz/wallet-arringo/pkg/wire"
 	"github.com/gin-gonic/gin"
-	"sync"
 )
 
 // RegisterTransaction registers transaction-related HTTP endpoints on the provided RouterGroup.
@@ -120,32 +119,13 @@ func transferMoney(c *gin.Context) {
 		return
 	}
 
-	var wg sync.WaitGroup
-
-	// Launch concurrent goroutines
-	for i := 0; i < 10000; i++ {
-		wg.Add(1)
-		go func(fromUser, toUser string, amount float64) {
-			defer wg.Done()
-
-			err = wire.Svc.TransactionService.TransferMoney(c, req.From, req.To, req.Amount)
-			if err != nil {
-				c.PureJSON(500, gin.H{"error": err.Error()})
-				return
-			}
-		}(req.From, req.To, req.Amount)
-		wg.Wait()
-
-		c.Status(200)
+	// Call the TransactionService to transfer money
+	err = wire.Svc.TransactionService.TransferMoney(c, req.From, req.To, req.Amount)
+	if err != nil {
+		c.PureJSON(500, gin.H{"error": err.Error()})
+		return
 	}
 
-	//// Call the TransactionService to transfer money
-	//err = wire.Svc.TransactionService.TransferMoney(c, req.From, req.To, req.Amount)
-	//if err != nil {
-	//	c.PureJSON(500, gin.H{"error": err.Error()})
-	//	return
-	//}
-	//
-	//// Respond with success
-	//c.Status(200)
+	// Respond with success
+	c.Status(200)
 }
