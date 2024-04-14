@@ -1,5 +1,5 @@
 # Start from the latest golang base image
-FROM golang:1.20-alpine
+FROM golang:1.22-alpine
 
 # Install git
 #RUN apk add --no-cache git
@@ -11,7 +11,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 
 # Download and install the dependencies
-RUN go mod download
+RUN go mod tidy
 
 # Copy the current directory contents into the container at /app
 COPY . .
