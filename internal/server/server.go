@@ -2,11 +2,14 @@ package server
 
 import (
 	"github.com/GGmaz/wallet-arringo/config"
+	"github.com/GGmaz/wallet-arringo/docs"
 	"github.com/GGmaz/wallet-arringo/internal/db"
 	"github.com/GGmaz/wallet-arringo/internal/scheduler"
 	v1 "github.com/GGmaz/wallet-arringo/internal/server/api"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 	"log"
 )
@@ -36,6 +39,12 @@ func NewServer(config *config.Config) *Server {
 	}
 }
 
+// @title e-wallet API
+// @version 1.0
+// @description This is a project for Arringo company.
+
+// @host localhost:8082
+// @BasePath /api/v1
 func (server *Server) Start() {
 	r := gin.Default()
 	r.Use(gin.Logger())
@@ -58,6 +67,10 @@ func (server *Server) Start() {
 	r.Use(CORSMiddleware())
 
 	v1.RegisterVersion(r)
+
+	// Swagger
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	err = r.Run(":" + server.config.Port)
 

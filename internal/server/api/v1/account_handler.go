@@ -15,6 +15,17 @@ func RegisterAccount(v1 *gin.RouterGroup) {
 }
 
 // createAccount handles the HTTP request to create a new account.
+// @Tags Account
+// @Summary Create Account
+// @Description Create a new account for user
+// @ID create account
+// @Accept  json
+// @Produce  json
+// @Param account body model.Account true "Account" default({"acc_number":"1234", "user_id":1})
+// @Success 200 {object} model.Account "ok"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /accounts [post]
 func createAccount(c *gin.Context) {
 	// Parse the request body to create a new account
 	var createAcc model.Account

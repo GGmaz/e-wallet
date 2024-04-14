@@ -1,0 +1,248 @@
+basePath: /api/v1
+definitions:
+  enums.AccountStatus:
+    enum:
+    - Verified
+    type: string
+    x-enum-varnames:
+    - VERIFIED
+  model.Account:
+    properties:
+      acc_number:
+        type: string
+      balance:
+        type: number
+      id:
+        type: integer
+      status:
+        $ref: '#/definitions/enums.AccountStatus'
+      user_id:
+        type: integer
+    type: object
+  model.User:
+    properties:
+      accounts:
+        items:
+          $ref: '#/definitions/model.Account'
+        type: array
+      address:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.AddMoneyReq:
+    properties:
+      acc_number:
+        type: string
+      amount:
+        type: number
+      user_id:
+        type: integer
+    type: object
+  models.TransferMoneyReq:
+    properties:
+      amount:
+        type: number
+      from_acc_id:
+        type: string
+      to_acc_id:
+        type: string
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: This is a project for Arringo company.
+  title: e-wallet API
+  version: "1.0"
+paths:
+  /accounts:
+    post:
+      consumes:
+      - application/json
+      description: Create a new account for user
+      operationId: create account
+      parameters:
+      - description: Account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/model.Account'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/model.Account'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create Account
+      tags:
+      - Account
+  /transactions/deposit:
+    post:
+      consumes:
+      - application/json
+      description: Deposit money into an account
+      operationId: deposit money
+      parameters:
+      - description: Deposit
+        in: body
+        name: deposit
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddMoneyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: float
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Deposit Money
+      tags:
+      - Transaction
+  /transactions/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfer money between accounts
+      operationId: transfer money
+      parameters:
+      - description: Transfer
+        in: body
+        name: transfer
+        required: true
+        schema:
+          $ref: '#/definitions/models.TransferMoneyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Transfer Money
+      tags:
+      - Transaction
+  /transactions/withdraw:
+    post:
+      consumes:
+      - application/json
+      description: Withdraw money from an account
+      operationId: withdraw money
+      parameters:
+      - description: Withdraw
+        in: body
+        name: withdraw
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddMoneyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: float
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Withdraw Money
+      tags:
+      - Transaction
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      operationId: create user
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create User
+      tags:
+      - User
+  /users/{email}/accounts:
+    get:
+      consumes:
+      - application/json
+      description: Get accounts associated with a user
+      operationId: get accounts
+      parameters:
+      - default: srecko@gmail.com
+        description: User Email
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Accounts
+      tags:
+      - User
+swagger: "2.0"

@@ -17,6 +17,17 @@ func RegisterTransaction(v1 *gin.RouterGroup) {
 }
 
 // deposit handles the HTTP request to deposit money into an account.
+// @Tags Transaction
+// @Summary Deposit Money
+// @Description Deposit money into an account
+// @ID deposit money
+// @Accept  json
+// @Produce  json
+// @Param deposit body models.AddMoneyReq true "Deposit" default({"userId":1, "accNumber":"1234", "amount":100})
+// @Success 200 {float} float "ok"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /transactions/deposit [post]
 func deposit(c *gin.Context) {
 	// Parse the request body to extract deposit details
 	var req models.AddMoneyReq
@@ -44,6 +55,17 @@ func deposit(c *gin.Context) {
 }
 
 // withdraw handles the HTTP request to withdraw money from an account.
+// @Tags Transaction
+// @Summary Withdraw Money
+// @Description Withdraw money from an account
+// @ID withdraw money
+// @Accept  json
+// @Produce  json
+// @Param withdraw body models.AddMoneyReq true "Withdraw" default({"userId":1, "accNumber":"1234", "amount":10})
+// @Success 200 {float} float "ok"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /transactions/withdraw [post]
 func withdraw(c *gin.Context) {
 	// Parse the request body to extract withdrawal details
 	var req models.AddMoneyReq
@@ -71,6 +93,17 @@ func withdraw(c *gin.Context) {
 }
 
 // transferMoney handles the HTTP request to transfer money between accounts.
+// @Tags Transaction
+// @Summary Transfer Money
+// @Description Transfer money between accounts
+// @ID transfer money
+// @Accept  json
+// @Produce  json
+// @Param transfer body models.TransferMoneyReq true "Transfer" default({"from_acc_id":"1234", "to_acc_id":"5678", "amount":10})
+// @Success 200 "ok"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /transactions/transfer [post]
 func transferMoney(c *gin.Context) {
 	// Parse the request body to extract transfer details
 	var req models.TransferMoneyReq

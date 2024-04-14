@@ -16,6 +16,18 @@ func RegisterUser(v1 *gin.RouterGroup) {
 }
 
 // createUser handles the HTTP request to create a new user.
+// createUser handles the HTTP request to create a new user.
+// @Tags User
+// @Summary Create User
+// @Description Create a new user
+// @ID create user
+// @Accept  json
+// @Produce  json
+// @Param user body model.User true "User" default({"first_name":"srecko", "last_name":"asdas", "email":"srecko@gmail.com", "address":"asdasd"})
+// @Success 200 {object} model.User "ok"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /users [post]
 func createUser(c *gin.Context) {
 	// Parse the request body to create a new user
 	var createUser model.User
@@ -43,6 +55,17 @@ func createUser(c *gin.Context) {
 }
 
 // getAccounts handles the HTTP request to retrieve accounts associated with a user.
+// @Tags User
+// @Summary Get Accounts
+// @Description Get accounts associated with a user
+// @ID get accounts
+// @Accept  json
+// @Produce  json
+// @Param email path string true "User Email" default(srecko@gmail.com)
+// @Success 200 {object} model.User "ok"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /users/{email}/accounts [get]
 func getAccounts(c *gin.Context) {
 	// Parse the user email from the request parameters
 	userEmail := c.Param("email")
