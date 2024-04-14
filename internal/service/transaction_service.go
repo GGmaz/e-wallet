@@ -49,6 +49,16 @@ func (s *TransactionServiceImpl) AddMoney(c *gin.Context, userId int64, amount f
 	return balance, nil
 }
 
+func (s *TransactionServiceImpl) Withdraw(c *gin.Context, userId int64, amount float64, accNum string) (float64, error) {
+	balance, err := s.myTransfer(c, userId, amount, accNum, enums.DEBIT)
+	if err != nil {
+		return balance, err
+	}
+
+	log.Println("Money has been successfully withdrawn from the account: ", accNum)
+	return balance, nil
+}
+
 func (s *TransactionServiceImpl) myTransfer(c *gin.Context, userId int64, amount float64, accNum string, transferType enums.TxType) (float64, error) {
 	db := c.MustGet("transaction").(*gorm.DB)
 
@@ -90,48 +100,6 @@ func (s *TransactionServiceImpl) myTransfer(c *gin.Context, userId int64, amount
 	}
 
 	tx.Commit()
-	return acc.Balance, nil
-}
-
-func (s *TransactionServiceImpl) Withdraw(c *gin.Context, userId int64, amount float64, accNum string) (float64, error) {
-	db := c.MustGet("transaction").(*gorm.DB)
-
-	if !repo.HasUserAccount(db, userId, accNum) || !repo.IsAccountVerified(db, accNum) {
-		return 0, errors.New("user does not have account with provided account number or account is not verified")
-	}
-
-	tx := db.Begin()
-	defer tx.Rollback()
-
-	acc := &model.Account{}
-	res := repo.GetAccountByNum(tx, acc, accNum)
-	if res.Error != nil {
-		tx.Rollback()
-		return 0, res.Error
-	}
-
-	if acc.Balance < amount {
-		tx.Rollback()
-		return 0, errors.New("insufficient balance on account")
-	}
-
-	acc.Balance -= amount
-
-	res = s.AccountRepo.Update(tx, acc, acc.ID)
-	if res.Error != nil {
-		tx.Rollback()
-		return 0, res.Error
-	}
-
-	_, err := s.CreateTransaction(tx, userId, amount, acc.Balance, enums.DEBIT, accNum, enums.SUCCESS, "")
-	if err != nil {
-		tx.Rollback()
-		return 0, err
-	}
-
-	tx.Commit()
-
-	log.Println("Money has been successfully withdrawn from the account: ", accNum)
 	return acc.Balance, nil
 }
 
