@@ -71,7 +71,6 @@ paths:
       - description: X-Authorization-Sign
         in: header
         name: X-Authorization-Sign
-        required: true
         type: string
       - description: Account
         in: body
@@ -107,7 +106,6 @@ paths:
       - description: X-Authorization-Sign
         in: header
         name: X-Authorization-Sign
-        required: true
         type: string
       - description: Deposit
         in: body
@@ -121,7 +119,7 @@ paths:
         "200":
           description: ok
           schema:
-            type: float
+            type: number
         "400":
           description: Bad Request
           schema:
@@ -143,7 +141,6 @@ paths:
       - description: X-Authorization-Sign
         in: header
         name: X-Authorization-Sign
-        required: true
         type: string
       - description: Transfer
         in: body
@@ -177,7 +174,6 @@ paths:
       - description: X-Authorization-Sign
         in: header
         name: X-Authorization-Sign
-        required: true
         type: string
       - description: Withdraw
         in: body
@@ -191,7 +187,7 @@ paths:
         "200":
           description: ok
           schema:
-            type: float
+            type: number
         "400":
           description: Bad Request
           schema:
@@ -213,7 +209,6 @@ paths:
       - description: X-Authorization-Sign
         in: header
         name: X-Authorization-Sign
-        required: true
         type: string
       - description: User
         in: body
@@ -246,11 +241,6 @@ paths:
       description: Get accounts associated with a user
       operationId: get accounts
       parameters:
-      - description: X-Authorization-Sign
-        in: header
-        name: X-Authorization-Sign
-        required: true
-        type: string
       - default: srecko@gmail.com
         description: User Email
         in: path

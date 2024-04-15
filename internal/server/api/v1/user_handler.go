@@ -23,7 +23,7 @@ func RegisterUser(v1 *gin.RouterGroup) {
 // @ID create user
 // @Accept  json
 // @Produce  json
-// @Param X-Authorization-Sign header string true "X-Authorization-Sign"
+// @Param X-Authorization-Sign header string false "X-Authorization-Sign"
 // @Param user body model.User true "User" default({"first_name":"srecko", "last_name":"asdas", "email":"srecko@gmail.com", "address":"asdasd"})
 // @Success 200 {object} model.User "ok"
 // @Failure 400 {string} string "Bad Request"
@@ -62,7 +62,6 @@ func createUser(c *gin.Context) {
 // @ID get accounts
 // @Accept  json
 // @Produce  json
-// @Param X-Authorization-Sign header string true "X-Authorization-Sign"
 // @Param email path string true "User Email" default(srecko@gmail.com)
 // @Success 200 {object} model.User "ok"
 // @Failure 400 {string} string "Bad Request"

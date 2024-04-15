@@ -28,8 +28,7 @@
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "Account",
@@ -82,8 +81,7 @@
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "Deposit",
@@ -99,7 +97,7 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "float"
+                            "type": "number"
                         }
                     },
                     "400": {
@@ -136,8 +134,7 @@
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "Transfer",
@@ -187,8 +184,7 @@
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "Withdraw",
@@ -204,7 +200,7 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "float"
+                            "type": "number"
                         }
                     },
                     "400": {
@@ -241,8 +237,7 @@
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "User",
@@ -291,13 +286,6 @@
                 "summary": "Get Accounts",
                 "operationId": "get accounts",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "X-Authorization-Sign",
-                        "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
-                    },
                     {
                         "type": "string",
                         "default": "srecko@gmail.com",

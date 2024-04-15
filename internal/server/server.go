@@ -40,7 +40,7 @@ func redisMiddleware(redisClient *redis.Client) gin.HandlerFunc {
 func hmacValidationMiddleware(secretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// check if request url starts with /swagger
-		if c.Request.URL.Path[:len("/swagger")] == "/swagger" {
+		if c.Request.URL.Path[:len("/swagger")] == "/swagger" || c.Request.ContentLength == 0 {
 			c.Next()
 			return
 		}
@@ -106,7 +106,8 @@ func (server *Server) Start() {
 
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
 	r.Use(gin.Recovery())
-	r.Use(pgMiddleware(gormDB), redisMiddleware(redisClient), hmacValidationMiddleware(server.config.SecretKey))
+	r.Use(pgMiddleware(gormDB), redisMiddleware(redisClient))
+	r.Use(hmacValidationMiddleware(server.config.SecretKey))
 	r.Use(CORSMiddleware())
 
 	v1.RegisterVersion(r)

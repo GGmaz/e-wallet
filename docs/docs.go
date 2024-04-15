@@ -34,8 +34,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "Account",
@@ -88,8 +87,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "Deposit",
@@ -105,7 +103,7 @@ const docTemplate = `{
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "float"
+                            "type": "number"
                         }
                     },
                     "400": {
@@ -142,8 +140,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "Transfer",
@@ -193,8 +190,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "Withdraw",
@@ -210,7 +206,7 @@ const docTemplate = `{
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "float"
+                            "type": "number"
                         }
                     },
                     "400": {
@@ -247,8 +243,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "X-Authorization-Sign",
                         "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "User",
@@ -297,13 +292,6 @@ const docTemplate = `{
                 "summary": "Get Accounts",
                 "operationId": "get accounts",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "X-Authorization-Sign",
-                        "name": "X-Authorization-Sign",
-                        "in": "header",
-                        "required": true
-                    },
                     {
                         "type": "string",
                         "default": "srecko@gmail.com",

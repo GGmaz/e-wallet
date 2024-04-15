@@ -23,9 +23,9 @@ func RegisterTransaction(v1 *gin.RouterGroup) {
 // @ID deposit money
 // @Accept  json
 // @Produce  json
-// @Param X-Authorization-Sign header string true "X-Authorization-Sign"
+// @Param X-Authorization-Sign header string false "X-Authorization-Sign"
 // @Param deposit body models.AddMoneyReq true "Deposit" default({"userId":1, "accNumber":"1234", "amount":100})
-// @Success 200 {float} float "ok"
+// @Success 200 {number} number "ok"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /transactions/deposit [post]
@@ -62,9 +62,9 @@ func deposit(c *gin.Context) {
 // @ID withdraw money
 // @Accept  json
 // @Produce  json
-// @Param X-Authorization-Sign header string true "X-Authorization-Sign"
+// @Param X-Authorization-Sign header string false "X-Authorization-Sign"
 // @Param withdraw body models.AddMoneyReq true "Withdraw" default({"userId":1, "accNumber":"1234", "amount":10})
-// @Success 200 {float} float "ok"
+// @Success 200 {number} number "ok"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /transactions/withdraw [post]
@@ -101,7 +101,7 @@ func withdraw(c *gin.Context) {
 // @ID transfer money
 // @Accept  json
 // @Produce  json
-// @Param X-Authorization-Sign header string true "X-Authorization-Sign"
+// @Param X-Authorization-Sign header string false "X-Authorization-Sign"
 // @Param transfer body models.TransferMoneyReq true "Transfer" default({"from_acc_id":"1234", "to_acc_id":"5678", "amount":10})
 // @Success 200 "ok"
 // @Failure 400 {string} string "Bad Request"
@@ -117,8 +117,8 @@ func transferMoney(c *gin.Context) {
 	}
 
 	// Validate the request parameters
-	if req.From == "" || req.To == "" || req.Amount <= 0 {
-		c.PureJSON(400, gin.H{"error": "from_acc_id, to_acc_id, and amount are required and cannot be <=0 or empty"})
+	if req.From == "" || req.To == "" || req.Amount <= 0 || req.From == req.To {
+		c.PureJSON(400, gin.H{"error": "from_acc_id, to_acc_id, and amount are required and cannot be <=0 or empty. from_acc_id and to_acc_id have to be different values"})
 		return
 	}
 

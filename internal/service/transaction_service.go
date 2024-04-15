@@ -87,7 +87,7 @@ func (s *TransactionServiceImpl) myTransfer(c *gin.Context, userId int64, amount
 		acc.Balance -= amount
 	}
 
-	res = s.AccountRepo.Update(tx, acc, acc.ID)
+	res = s.AccountRepo.Save(tx, acc)
 	if res.Error != nil {
 		tx.Rollback()
 		return 0, res.Error
@@ -172,6 +172,16 @@ func (s *TransactionServiceImpl) TransferMoney(c *gin.Context, from, to string, 
 }
 
 func (s *TransactionServiceImpl) DoTransfer(tx *gorm.DB, fromAcc *model.Account, amount float64, toAcc *model.Account, transactionId string) error {
+	if fromAcc.Status != enums.VERIFIED || toAcc.Status != enums.VERIFIED {
+		tx.Rollback()
+		return errors.New("account is not verified")
+	}
+
+	if fromAcc.Balance < amount {
+		tx.Rollback()
+		return errors.New(fmt.Sprintf("insufficient balance on account %s", fromAcc.AccNumber))
+	}
+
 	if transactionId != "" {
 		err := s.updateReservedTx(tx, transactionId, amount)
 		if err != nil {
@@ -183,13 +193,13 @@ func (s *TransactionServiceImpl) DoTransfer(tx *gorm.DB, fromAcc *model.Account,
 	fromAcc.Balance -= amount
 	toAcc.Balance += amount
 
-	res := s.AccountRepo.Update(tx, fromAcc, fromAcc.ID)
+	res := s.AccountRepo.Save(tx, fromAcc)
 	if res.Error != nil {
 		tx.Rollback()
 		return res.Error
 	}
 
-	res = s.AccountRepo.Update(tx, toAcc, toAcc.ID)
+	res = s.AccountRepo.Save(tx, toAcc)
 	if res.Error != nil {
 		tx.Rollback()
 		return res.Error
@@ -219,7 +229,7 @@ func (s *TransactionServiceImpl) updateReservedTx(tx *gorm.DB, transactionId str
 
 	transaction.Status = enums.SUCCESS
 	transaction.Balance -= amount
-	res = s.TransactionRepo.Update(tx, transaction, transaction.ID)
+	res = s.TransactionRepo.Save(tx, transaction)
 	if res.Error != nil {
 		return res.Error
 	}

@@ -27,7 +27,8 @@ func (r Repo[T]) Save(db *gorm.DB, t *T) *gorm.DB {
 }
 
 func (r Repo[T]) Update(db *gorm.DB, t *T, id int64) *gorm.DB {
-	return db.Model(t).Clauses(clause.Returning{}).Where("id = ?", id).Updates(t)
+	res := db.Model(t).Clauses(clause.Returning{}).Where("id = ?", id).Updates(t)
+	return res
 }
 
 func (r Repo[T]) GetByField(db *gorm.DB, t *T, field string, fieldVal string, preload ...string) *gorm.DB {
