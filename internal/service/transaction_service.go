@@ -15,9 +15,9 @@ import (
 )
 
 type TransactionServiceImpl struct {
-	TransactionRepo Repository[model.Transaction]
-	AccountRepo     Repository[model.Account]
-	UserRepo        Repository[model.User]
+	TransactionRepo repo.Repo[model.Transaction]
+	UserRepo        repo.Repo[model.User]
+	AccountRepo     repo.Repo[model.Account]
 }
 
 func (s *TransactionServiceImpl) CreateTransaction(db *gorm.DB, userId int64, amount, balance float64, txType enums.TxType, accNum string, txStatus enums.TxStatus, pair string) (*model.Transaction, error) {

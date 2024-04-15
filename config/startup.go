@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	Port    string
-	Host    string
-	DbPg    DBConfigPg
-	DbRedis DBConfigRedis
+	Port      string
+	Host      string
+	DbPg      DBConfigPg
+	DbRedis   DBConfigRedis
+	SecretKey string
 }
 
 type DBConfigPg struct {
@@ -53,6 +54,7 @@ func NewConfig() *Config {
 			Host: goDotEnvVariable("DB_REDIS_HOST"),
 			Port: portRedis,
 		},
+		SecretKey: goDotEnvVariable("SECRET_KEY"),
 	}
 }
 

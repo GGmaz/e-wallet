@@ -31,6 +31,13 @@ const docTemplate = `{
                 "operationId": "create account",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "X-Authorization-Sign",
+                        "name": "X-Authorization-Sign",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Account",
                         "name": "account",
                         "in": "body",
@@ -77,6 +84,13 @@ const docTemplate = `{
                 "summary": "Deposit Money",
                 "operationId": "deposit money",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "X-Authorization-Sign",
+                        "name": "X-Authorization-Sign",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Deposit",
                         "name": "deposit",
@@ -125,6 +139,13 @@ const docTemplate = `{
                 "operationId": "transfer money",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "X-Authorization-Sign",
+                        "name": "X-Authorization-Sign",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Transfer",
                         "name": "transfer",
                         "in": "body",
@@ -168,6 +189,13 @@ const docTemplate = `{
                 "summary": "Withdraw Money",
                 "operationId": "withdraw money",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "X-Authorization-Sign",
+                        "name": "X-Authorization-Sign",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Withdraw",
                         "name": "withdraw",
@@ -216,6 +244,13 @@ const docTemplate = `{
                 "operationId": "create user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "X-Authorization-Sign",
+                        "name": "X-Authorization-Sign",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "User",
                         "name": "user",
                         "in": "body",
@@ -262,6 +297,13 @@ const docTemplate = `{
                 "summary": "Get Accounts",
                 "operationId": "get accounts",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "X-Authorization-Sign",
+                        "name": "X-Authorization-Sign",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "default": "srecko@gmail.com",

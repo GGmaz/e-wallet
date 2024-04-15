@@ -21,6 +21,7 @@ func RegisterAccount(v1 *gin.RouterGroup) {
 // @ID create account
 // @Accept  json
 // @Produce  json
+// @Param X-Authorization-Sign header string true "X-Authorization-Sign"
 // @Param account body model.Account true "Account" default({"acc_number":"1234", "user_id":1})
 // @Success 200 {object} model.Account "ok"
 // @Failure 400 {string} string "Bad Request"

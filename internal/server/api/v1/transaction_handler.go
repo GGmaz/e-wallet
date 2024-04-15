@@ -23,6 +23,7 @@ func RegisterTransaction(v1 *gin.RouterGroup) {
 // @ID deposit money
 // @Accept  json
 // @Produce  json
+// @Param X-Authorization-Sign header string true "X-Authorization-Sign"
 // @Param deposit body models.AddMoneyReq true "Deposit" default({"userId":1, "accNumber":"1234", "amount":100})
 // @Success 200 {float} float "ok"
 // @Failure 400 {string} string "Bad Request"
@@ -61,6 +62,7 @@ func deposit(c *gin.Context) {
 // @ID withdraw money
 // @Accept  json
 // @Produce  json
+// @Param X-Authorization-Sign header string true "X-Authorization-Sign"
 // @Param withdraw body models.AddMoneyReq true "Withdraw" default({"userId":1, "accNumber":"1234", "amount":10})
 // @Success 200 {float} float "ok"
 // @Failure 400 {string} string "Bad Request"
@@ -99,6 +101,7 @@ func withdraw(c *gin.Context) {
 // @ID transfer money
 // @Accept  json
 // @Produce  json
+// @Param X-Authorization-Sign header string true "X-Authorization-Sign"
 // @Param transfer body models.TransferMoneyReq true "Transfer" default({"from_acc_id":"1234", "to_acc_id":"5678", "amount":10})
 // @Success 200 "ok"
 // @Failure 400 {string} string "Bad Request"

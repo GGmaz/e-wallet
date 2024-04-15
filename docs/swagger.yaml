@@ -68,6 +68,11 @@ paths:
       description: Create a new account for user
       operationId: create account
       parameters:
+      - description: X-Authorization-Sign
+        in: header
+        name: X-Authorization-Sign
+        required: true
+        type: string
       - description: Account
         in: body
         name: account
@@ -99,6 +104,11 @@ paths:
       description: Deposit money into an account
       operationId: deposit money
       parameters:
+      - description: X-Authorization-Sign
+        in: header
+        name: X-Authorization-Sign
+        required: true
+        type: string
       - description: Deposit
         in: body
         name: deposit
@@ -130,6 +140,11 @@ paths:
       description: Transfer money between accounts
       operationId: transfer money
       parameters:
+      - description: X-Authorization-Sign
+        in: header
+        name: X-Authorization-Sign
+        required: true
+        type: string
       - description: Transfer
         in: body
         name: transfer
@@ -159,6 +174,11 @@ paths:
       description: Withdraw money from an account
       operationId: withdraw money
       parameters:
+      - description: X-Authorization-Sign
+        in: header
+        name: X-Authorization-Sign
+        required: true
+        type: string
       - description: Withdraw
         in: body
         name: withdraw
@@ -190,6 +210,11 @@ paths:
       description: Create a new user
       operationId: create user
       parameters:
+      - description: X-Authorization-Sign
+        in: header
+        name: X-Authorization-Sign
+        required: true
+        type: string
       - description: User
         in: body
         name: user
@@ -221,6 +246,11 @@ paths:
       description: Get accounts associated with a user
       operationId: get accounts
       parameters:
+      - description: X-Authorization-Sign
+        in: header
+        name: X-Authorization-Sign
+        required: true
+        type: string
       - default: srecko@gmail.com
         description: User Email
         in: path
