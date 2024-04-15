@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"github.com/GGmaz/wallet-arringo/internal/db/model"
-	"github.com/GGmaz/wallet-arringo/internal/repo"
 	"github.com/GGmaz/wallet-arringo/pkg/enums"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -12,9 +11,17 @@ import (
 	"time"
 )
 
+// Define an interface for the repository
+type Repository[T any] interface {
+	Create(db *gorm.DB, t *T) *gorm.DB
+	GetByField(db *gorm.DB, t *T, field string, fieldVal string, preload ...string) *gorm.DB
+	Update(db *gorm.DB, t *T, id int64) *gorm.DB
+	GetById(db *gorm.DB, t *T, id int64, preload ...string) *gorm.DB
+}
+
 type AccountServiceImpl struct {
-	AccountRepo repo.Repo[model.Account]
-	UserRepo    repo.Repo[model.User]
+	AccountRepo Repository[model.Account]
+	UserRepo    Repository[model.User]
 }
 
 func (s *AccountServiceImpl) CreateAccount(c *gin.Context, accNum string, userId int64) (*model.Account, error) {
